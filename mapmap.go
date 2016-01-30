@@ -5,7 +5,7 @@ import (
 	"github.com/spf13/cast"
 	"reflect"
 	"regexp"
-	"strings"
+	_ "strings"
 )
 
 /*
@@ -15,85 +15,146 @@ We want a map of strings to functions that can
 Get function:
 https://github.com/spf13/viper/blob/master/viper.go#L457
 
+https://github.com/hashicorp/terraform/tree/master/flatmap
+https://github.com/hashicorp/terraform/blob/master/flatmap/flatten.go
+
 */
 
-var SliceKeyPattern = regexp.MustCompile(`\[(\d*)\]`)
+type MapperConfig struct {
+	keyDelim         string
+	sliceKeyPattern  *regexp.Regexp
+	sliceKeyTemplate func(int) string
+}
+
+var mc *MapperConfig
+
+func init() {
+	mc = New()
+}
+
+func New() *MapperConfig {
+	mc := new(MapperConfig)
+	mc.keyDelim = "."
+	mc.sliceKeyPattern = regexp.MustCompile(`\[(\d*)\]`)
+	mc.sliceKeyTemplate = func(i int) string {
+		return fmt.Sprintf("[%d]", i)
+	}
+	return mc
+}
+
+func Flatten(src interface{}) (map[string]interface{}, error) { return mc.Flatten(src) }
+func (c *MapperConfig) Flatten(src interface{}) (map[string]interface{}, error) {
+	var err error
+
+	result := make(map[string]interface{})
+
+	if reflect.TypeOf(src).Kind() == reflect.Map {
+		var s map[string]interface{}
+		s, err = cast.ToStringMapE(src)
+		if err != nil {
+			return result, err
+		}
+
+		for k, raw := range s {
+			err = c.flatten(result, k, reflect.ValueOf(raw))
+			if err != nil {
+				break
+			}
+		}
+
+	} else if reflect.TypeOf(src).Kind() == reflect.Slice {
+		var s []interface{}
+		s, err = cast.ToSliceE(src)
+		if err != nil {
+			return result, err
+		}
+
+		for i, raw := range s {
+			err = c.flatten(result, c.sliceKeyTemplate(i), reflect.ValueOf(raw))
+			if err != nil {
+				break
+			}
+		}
+	} else {
+		err = fmt.Errorf("Unknown type for interface")
+	}
+
+	return result, err
+}
+
+func (c *MapperConfig) flatten(result map[string]interface{}, prefix string, v reflect.Value) error {
+	var err error
+
+	if v.Kind() == reflect.Interface {
+		v = v.Elem()
+	}
+
+	// Set as type interface
+	switch v.Kind() {
+	case reflect.Bool:
+		result[prefix] = v.Bool()
+	case reflect.Int:
+		result[prefix] = v.Int()
+	case reflect.String:
+		result[prefix] = v.String()
+	case reflect.Map:
+		err = c.flattenMap(result, prefix, v)
+	case reflect.Slice:
+		err = c.flattenSlice(result, prefix, v)
+	default:
+		err = fmt.Errorf("Unknown primitive type found for value: '%q'", v)
+	}
+
+	return err
+}
+
+func (c *MapperConfig) flattenMap(result map[string]interface{}, prefix string, v reflect.Value) error {
+	var err error
+
+	for _, k := range v.MapKeys() {
+		if k.Kind() == reflect.Interface {
+			k = k.Elem()
+		}
+
+		if k.Kind() != reflect.String {
+			err = fmt.Errorf("%s: map key is not string: %s", prefix, k)
+			break
+		}
+
+		err = c.flatten(result, fmt.Sprintf("%s.%s", prefix, k.String()), v.MapIndex(k))
+		if err != nil {
+			break
+		}
+	}
+
+	return err
+}
+
+func (c *MapperConfig) flattenSlice(result map[string]interface{}, prefix string, v reflect.Value) error {
+	var err error
+
+	for i := 0; i < v.Len(); i++ {
+		err = c.flatten(result, fmt.Sprintf("%s.%s", prefix, c.sliceKeyTemplate(i)), v.Index(i))
+		if err != nil {
+			break
+		}
+	}
+
+	return err
+}
 
 type Mapper struct {
 	input      string // dot delimited path to input field in map
 	output     string // dot delimited path to output field in map
 	typeString string // string representation of type
 	checkType  string
-	keyDelim   string
+	exitEarly  bool
 }
 
 func (m *Mapper) Map(inMap *map[string]interface{}, outMap *map[string]interface{}) error {
 	return nil
 }
 
-// Only works with map[string]interface{} and []interface{}
-func GetNested(key string, src interface{}, keyDelim string) (val interface{}, err error) {
-	var isNested bool
-	var keyParts []string
-	if strings.Contains(key, keyDelim) {
-		isNested = true
-		keyParts = strings.Split(key, keyDelim)
-	} else {
-		isNested = false
-		keyParts = []string{key}
-	}
-	currentKey := keyParts[0]
-
-	fmt.Printf("currentKey: %s ; keyParts: %s, src: %s\n", currentKey, keyParts, src)
-
-	// Handle src as either map or slice
-	if reflect.TypeOf(src).Kind() == reflect.Map {
-		fmt.Println("type: map")
-		s, errp := cast.ToStringMapE(src)
-		fmt.Println("cast: ", s, errp)
-		val = cast.ToStringMap(src)[currentKey]
-		fmt.Println("val: ", val)
-	} else if reflect.TypeOf(src).Kind() == reflect.Slice {
-		fmt.Println("type: slice")
-		// Extract integer component from next key
-		var intKey int
-		ms := SliceKeyPattern.FindStringSubmatch(currentKey)
-		if len(ms) < 2 {
-			return nil, fmt.Errorf("The key '%s' cannot be used to index into slice '%s'", currentKey, src)
-		}
-		intKey, err = cast.ToIntE(ms[1])
-		if err != nil {
-			return nil, err
-		}
-
-		fmt.Printf("before: %s, after: %d\n", currentKey, intKey)
-
-		subSrc := cast.ToSlice(src)
-		if intKey >= 0 && intKey < len(subSrc) {
-			val = subSrc[intKey]
-		} else {
-			val = nil
-		}
-	} else {
-		fmt.Println("type: ???")
-		// Tried to index into something that's not an array or map
-		val = nil
-	}
-
-	fmt.Printf("value: %s \n", val)
-
-	if val == nil {
-		return val, err
-	}
-
-	if isNested {
-		subPath := strings.Join(keyParts[1:], keyDelim)
-		val, err = GetNested(subPath, val, keyDelim)
-	}
-
-	return val, err
-}
-
-func MapIt(inMap *map[string]interface{}, outMap *map[string]interface{}, mappers []Mapper, exitEarly bool) []error {
-	return []error{nil}
+func MapIt(inMap interface{}, mappers []Mapper) (interface{}, []error) {
+	return nil, []error{nil}
 }
