@@ -74,6 +74,7 @@ func (m FlatMap) Delete(prefix string) {
 	}
 }
 
+// Keys returns list of top-level keys.
 func (m FlatMap) Keys() []string {
 	var mapKeys = make(map[string]bool)
 	for k, _ := range m.Map {

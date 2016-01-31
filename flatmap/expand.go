@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+// Expand a flattened map back out into a map or slice.
+// All primitive value types will remain the same (no recasting).
 func Expand(src map[string]interface{}, key string) (interface{}, error) { return mc.Expand(src, key) }
 func (c *FlatMapConfig) Expand(m map[string]interface{}, key string) (interface{}, error) {
 	if v, ok := m[key]; ok {
@@ -34,7 +36,6 @@ func (c *FlatMapConfig) Expand(m map[string]interface{}, key string) (interface{
 }
 
 func (c *FlatMapConfig) expandArray(m map[string]interface{}, prefix string) ([]interface{}, error) {
-	// prefix doesnt include training '.['
 	var err error
 
 	// Find all items in array
@@ -43,9 +44,11 @@ func (c *FlatMapConfig) expandArray(m map[string]interface{}, prefix string) ([]
 		if !strings.HasPrefix(k, prefix) {
 			continue
 		}
+
 		// append string paths
 		// e.g. k=.things.[0].cat.frog; prefix=.things.; afterDelim=[0].cat.frog; nextPart=[0]
 		// e.g. k=.things.[0]; prefix=.; afterDelim=things.[0]; nextPart=things
+
 		afterDelim := k[len(prefix)+1:]
 		nextPart := prefix + c.keyDelim + strings.Split(afterDelim, c.keyDelim)[0]
 		arrayKeys[nextPart] = true
@@ -71,7 +74,6 @@ func (c *FlatMapConfig) expandArray(m map[string]interface{}, prefix string) ([]
 }
 
 func (c *FlatMapConfig) expandMap(m map[string]interface{}, prefix string) (map[string]interface{}, error) {
-	// prefix does not include trailing c.keyDelim
 	var err error
 
 	var mapKeys = make(map[string]string)

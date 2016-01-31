@@ -1,7 +1,7 @@
 Flatmap [![GoDoc](https://godoc.org/github.com/turtlemonvh/mapmap/flatmap?status.svg)](https://godoc.org/github.com/turtlemonvh/mapmap/flatmap)
 ===
 
-> **WORK IN PROGRESS:** Doesn't actually do anything useful yet
+> **WORK IN PROGRESS:** Works, but not as well as it looks like it does :P
 
 Flatten out and reexpand `map[string]interface{}` and `[]interface{}` objects.
 
