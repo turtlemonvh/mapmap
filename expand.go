@@ -15,7 +15,7 @@ func (c *MapperConfig) Expand(m map[string]interface{}, key string) (interface{}
 	}
 
 	// If we see ANYTHING that follows that indicates it is an array, we go with that
-	arrayKey := key + ".["
+	arrayKey := key + c.keyDelim + "["
 	for k, _ := range m {
 		if strings.HasPrefix(k, arrayKey) {
 			return c.expandArray(m, key)
@@ -23,7 +23,7 @@ func (c *MapperConfig) Expand(m map[string]interface{}, key string) (interface{}
 	}
 
 	// If we see ANYTHING that indicates it is a map, we go with that
-	mapKey := key + "."
+	mapKey := key + c.keyDelim
 	for k, _ := range m {
 		if strings.HasPrefix(k, mapKey) {
 			return c.expandMap(m, key)

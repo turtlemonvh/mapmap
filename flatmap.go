@@ -33,7 +33,7 @@ func (m FlatMap) Contains(key string) bool {
 
 // Delete deletes a key out of the map with the given prefix.
 func (m FlatMap) Delete(prefix string) {
-	prefix = "." + prefix
+	prefix = m.Config.keyDelim + prefix
 	for k, _ := range m.Map {
 		match := k == prefix
 		if !match {
@@ -41,7 +41,7 @@ func (m FlatMap) Delete(prefix string) {
 				continue
 			}
 
-			if k[len(prefix):len(prefix)+1] != "." {
+			if k[len(prefix):len(prefix)+1] != m.Config.keyDelim {
 				continue
 			}
 		}
@@ -68,7 +68,7 @@ func (m FlatMap) Keys() []string {
 // Any shared top level keys will be overwritten.
 func (m FlatMap) Merge(m2 *FlatMap) {
 	for _, prefix := range m2.Keys() {
-		prefix = "." + prefix
+		prefix = m.Config.keyDelim + prefix
 		m.Delete(prefix[1:])
 
 		for k, v := range m2.Map {

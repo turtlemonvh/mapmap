@@ -17,3 +17,10 @@ Define a list of mappers, and then call `mapmap.Mapit` on your map.  The result 
 * Lots of source taken from the [`flatmap` library](https://github.com/hashicorp/terraform/blob/master/flatmap/flatten.go) in terraform.
     * Mostly I just manage maps with interfaces and return errors instead of panicing.
 
+## TODO
+
+* actual mapmap implementation
+* escape key delimiter when flattening, unescape when expanding
+* tests for changing key delimiter
+    * e.g. merging maps with different delimiters
+* tougher tests in general

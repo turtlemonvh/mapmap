@@ -59,11 +59,11 @@ func (c *MapperConfig) flatten(result map[string]interface{}, prefix string, v r
 	// Set as type interface
 	switch v.Kind() {
 	case reflect.Bool:
-		result["."+prefix] = v.Bool()
+		result[c.keyDelim+prefix] = v.Bool()
 	case reflect.Int:
-		result["."+prefix] = v.Int()
+		result[c.keyDelim+prefix] = v.Int()
 	case reflect.String:
-		result["."+prefix] = v.String()
+		result[c.keyDelim+prefix] = v.String()
 	case reflect.Map:
 		err = c.flattenMap(result, prefix, v)
 	case reflect.Slice:
@@ -88,7 +88,7 @@ func (c *MapperConfig) flattenMap(result map[string]interface{}, prefix string, 
 			break
 		}
 
-		err = c.flatten(result, fmt.Sprintf("%s.%s", prefix, k.String()), v.MapIndex(k))
+		err = c.flatten(result, fmt.Sprintf("%s%s%s", prefix, c.keyDelim, k.String()), v.MapIndex(k))
 		if err != nil {
 			break
 		}
@@ -101,7 +101,7 @@ func (c *MapperConfig) flattenSlice(result map[string]interface{}, prefix string
 	var err error
 
 	for i := 0; i < v.Len(); i++ {
-		err = c.flatten(result, fmt.Sprintf("%s.%s", prefix, c.sliceKeyTemplate(i)), v.Index(i))
+		err = c.flatten(result, fmt.Sprintf("%s%s%s", prefix, c.keyDelim, c.sliceKeyTemplate(i)), v.Index(i))
 		if err != nil {
 			break
 		}
