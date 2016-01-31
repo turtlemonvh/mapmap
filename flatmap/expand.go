@@ -7,8 +7,11 @@ import (
 	"strings"
 )
 
-// Expand a flattened map back out into a map or slice.
-// All primitive value types will remain the same (no recasting).
+/*
+Expand a flattened map back out into a map or slice.
+
+	* All primitive value types will remain the same (no recasting).
+*/
 func Expand(src map[string]interface{}, key string) (interface{}, error) { return mc.Expand(src, key) }
 func (c *FlatMapConfig) Expand(m map[string]interface{}, key string) (interface{}, error) {
 	if v, ok := m[key]; ok {

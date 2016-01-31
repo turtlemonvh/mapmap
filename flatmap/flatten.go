@@ -9,10 +9,13 @@ import (
 	"reflect"
 )
 
-// Flatten a map or slice into a map.
-// * Keys in the resulting map are "." separated.
-// * Array indexes are enclosed in "[]"
-// * Terminal values can be: bool, int64, string
+/*
+ Flatten a map or slice into a map.
+
+	* Keys in the resulting map are "." separated.
+	* Array indexes are enclosed in "[]"
+	* Terminal values can be: bool, int64, string
+*/
 func Flatten(src interface{}) (map[string]interface{}, error) { return mc.Flatten(src) }
 func (c *FlatMapConfig) Flatten(src interface{}) (map[string]interface{}, error) {
 	var err error
