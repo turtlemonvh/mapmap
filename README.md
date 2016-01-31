@@ -10,6 +10,10 @@ Mapmap is for doing quick transformations on `map[string]interface{}` and `[]int
 
 Create a slice of `Mapper`s, and then call `mapmap.Mapit` on your object.  The result is a new object with fields reshuffled and transformed.
 
+## Testing
+
+    go test ./...
+
 ## Credits
 
 * Built with the awesome [`cast` library](https://github.com/spf13/cast) from spf13. 

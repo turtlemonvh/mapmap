@@ -1,4 +1,4 @@
-package mapmap
+package flatmap
 
 import (
 	_ "fmt"

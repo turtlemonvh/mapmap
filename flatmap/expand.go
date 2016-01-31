@@ -1,6 +1,6 @@
 // Based off
 // https://github.com/hashicorp/terraform/blob/master/flatmap/expand.go
-package mapmap
+package flatmap
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 )
 
 func Expand(src map[string]interface{}, key string) (interface{}, error) { return mc.Expand(src, key) }
-func (c *MapperConfig) Expand(m map[string]interface{}, key string) (interface{}, error) {
+func (c *FlatMapConfig) Expand(m map[string]interface{}, key string) (interface{}, error) {
 	if v, ok := m[key]; ok {
 		// FIXME: Additional casting needed?
 		return v, nil
@@ -33,7 +33,7 @@ func (c *MapperConfig) Expand(m map[string]interface{}, key string) (interface{}
 	return nil, fmt.Errorf("Key '%s' is not present in this map", key)
 }
 
-func (c *MapperConfig) expandArray(m map[string]interface{}, prefix string) ([]interface{}, error) {
+func (c *FlatMapConfig) expandArray(m map[string]interface{}, prefix string) ([]interface{}, error) {
 	// prefix doesnt include training '.['
 	var err error
 
@@ -70,7 +70,7 @@ func (c *MapperConfig) expandArray(m map[string]interface{}, prefix string) ([]i
 	return result, nil
 }
 
-func (c *MapperConfig) expandMap(m map[string]interface{}, prefix string) (map[string]interface{}, error) {
+func (c *FlatMapConfig) expandMap(m map[string]interface{}, prefix string) (map[string]interface{}, error) {
 	// prefix does not include trailing c.keyDelim
 	var err error
 

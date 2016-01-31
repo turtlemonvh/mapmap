@@ -1,4 +1,4 @@
-package mapmap
+package flatmap
 
 import (
 	"github.com/spf13/cast"

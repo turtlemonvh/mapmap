@@ -1,7 +1,7 @@
 // Based off:
 // https://github.com/hashicorp/terraform/blob/master/flatmap/flatten.go
 
-package mapmap
+package flatmap
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 )
 
 func Flatten(src interface{}) (map[string]interface{}, error) { return mc.Flatten(src) }
-func (c *MapperConfig) Flatten(src interface{}) (map[string]interface{}, error) {
+func (c *FlatMapConfig) Flatten(src interface{}) (map[string]interface{}, error) {
 	var err error
 
 	result := make(map[string]interface{})
@@ -49,7 +49,7 @@ func (c *MapperConfig) Flatten(src interface{}) (map[string]interface{}, error) 
 	return result, err
 }
 
-func (c *MapperConfig) flatten(result map[string]interface{}, prefix string, v reflect.Value) error {
+func (c *FlatMapConfig) flatten(result map[string]interface{}, prefix string, v reflect.Value) error {
 	var err error
 
 	if v.Kind() == reflect.Interface {
@@ -75,7 +75,7 @@ func (c *MapperConfig) flatten(result map[string]interface{}, prefix string, v r
 	return err
 }
 
-func (c *MapperConfig) flattenMap(result map[string]interface{}, prefix string, v reflect.Value) error {
+func (c *FlatMapConfig) flattenMap(result map[string]interface{}, prefix string, v reflect.Value) error {
 	var err error
 
 	for _, k := range v.MapKeys() {
@@ -97,7 +97,7 @@ func (c *MapperConfig) flattenMap(result map[string]interface{}, prefix string, 
 	return err
 }
 
-func (c *MapperConfig) flattenSlice(result map[string]interface{}, prefix string, v reflect.Value) error {
+func (c *FlatMapConfig) flattenSlice(result map[string]interface{}, prefix string, v reflect.Value) error {
 	var err error
 
 	for i := 0; i < v.Len(); i++ {

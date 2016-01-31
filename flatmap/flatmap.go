@@ -1,17 +1,41 @@
 // Based off
 // https://github.com/hashicorp/terraform/blob/master/flatmap/map.go
 
-package mapmap
+package flatmap
 
 import (
+	"fmt"
+	"regexp"
 	"strings"
 )
+
+type FlatMapConfig struct {
+	keyDelim         string
+	sliceKeyPattern  *regexp.Regexp
+	sliceKeyTemplate func(int) string
+}
+
+var mc *FlatMapConfig
+
+func init() {
+	mc = NewFlatMapConfig()
+}
+
+func NewFlatMapConfig() *FlatMapConfig {
+	mc := new(FlatMapConfig)
+	mc.keyDelim = "."
+	mc.sliceKeyPattern = regexp.MustCompile(`\[(\d*)\]`)
+	mc.sliceKeyTemplate = func(i int) string {
+		return fmt.Sprintf("[%d]", i)
+	}
+	return mc
+}
 
 // Can't extend map directly
 // https://groups.google.com/forum/#!topic/golang-nuts/d9HMyUoKPqc
 type FlatMap struct {
 	Map    map[string]interface{}
-	Config *MapperConfig
+	Config *FlatMapConfig
 }
 
 func NewFlatMap(m map[string]interface{}) *FlatMap {

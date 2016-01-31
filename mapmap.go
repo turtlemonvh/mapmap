@@ -1,10 +1,11 @@
 package mapmap
 
 import (
-	"fmt"
+	_ "fmt"
 	_ "github.com/spf13/cast"
+	_ "github.com/turtlemonvh/mapmap/flatmap"
 	_ "reflect"
-	"regexp"
+	_ "regexp"
 	_ "strings"
 )
 
@@ -19,28 +20,6 @@ https://github.com/hashicorp/terraform/tree/master/flatmap
 https://github.com/hashicorp/terraform/blob/master/flatmap/flatten.go
 
 */
-
-type MapperConfig struct {
-	keyDelim         string
-	sliceKeyPattern  *regexp.Regexp
-	sliceKeyTemplate func(int) string
-}
-
-var mc *MapperConfig
-
-func init() {
-	mc = New()
-}
-
-func New() *MapperConfig {
-	mc := new(MapperConfig)
-	mc.keyDelim = "."
-	mc.sliceKeyPattern = regexp.MustCompile(`\[(\d*)\]`)
-	mc.sliceKeyTemplate = func(i int) string {
-		return fmt.Sprintf("[%d]", i)
-	}
-	return mc
-}
 
 type Mapper struct {
 	input      string // dot delimited path to input field in map
