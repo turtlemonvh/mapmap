@@ -3,13 +3,57 @@ Mapmap [![GoDoc](https://godoc.org/github.com/turtlemonvh/mapmap?status.svg)](ht
 
 > It maps your maps!
 
-> **WORK IN PROGRESS:** Doesn't actually do anything useful yet
+> **WORK IN PROGRESS:** Very limited features so far.
 
 ## Quick Start
 
 Mapmap is for doing quick transformations on `map[string]interface{}` and `[]interface{}` objects in golang (the stuff you get back when parsing json).
 
-Create a slice of `Mapper`s, and then call `mapmap.Mapit` on your object.  The result is a new object with fields reshuffled and transformed.
+Basic usage for shuffling around fields is as follows:
+
+```go
+package main
+
+import (
+    "fmt"
+
+    "github.com/turtlemonvh/mapmap"
+)
+
+func main() {
+
+    // You need an object to map
+    m := map[string]interface{}{
+        "cat":        "garfield",
+        "dog":        "odie",
+        "friends":    []interface{}{"John"},
+        "turtle":     "0",
+        "57":         int64(57),
+        "doesItWork": true,
+    }
+
+    // Create a slice of `Mapper`s describing transformations to run
+    var mappers []*mapmap.Mapper
+    mappers = append(mappers, mapmap.NewMapper("cat", "cat"))
+    mappers = append(mappers, mapmap.NewMapper("turtle", "frog"))
+    mappers = append(mappers, mapmap.NewMapper("friends.[0]", "myOnlyFriend"))
+
+    // Run the tranformations
+    new_map, processingErrors, err = mapmap.MapIt(m, mappers)
+
+    fmt.Println(new_map)
+}
+```
+
+This would result in the following value for `new_map`:
+
+```go
+map[string]interface{}{
+    "cat":          "garfield",
+    "frog":         "0",
+    "myOnlyFriend": "John",
+}
+```
 
 ## Testing
 

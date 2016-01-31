@@ -21,13 +21,15 @@ func TestMapMap(t *testing.T) {
 	}
 
 	r := map[string]interface{}{
-		"cat":  "garfield",
-		"frog": "0",
+		"cat":          "garfield",
+		"frog":         "0",
+		"myOnlyFriend": "John",
 	}
 
 	var mappers []*Mapper
 	mappers = append(mappers, NewMapper("cat", "cat"))
 	mappers = append(mappers, NewMapper("turtle", "frog"))
+	mappers = append(mappers, NewMapper("friends.[0]", "myOnlyFriend"))
 
 	v, processingErrors, err = MapIt(m, mappers)
 
