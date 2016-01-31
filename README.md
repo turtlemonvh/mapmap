@@ -6,9 +6,9 @@
 
 ## Quick Start
 
-Mapmap is for doing quick transformations on `map[string]interface{}` objects in golang.
+Mapmap is for doing quick transformations on `map[string]interface{}` and `[]interface{}` objects in golang (the stuff you get back when parsing json).
 
-Define a list of mappers, and then call `mapmap.Mapit` on your map.  The result is a new map with fields reshuffled and transformed.
+Create a slice of `Mapper`s, and then call `mapmap.Mapit` on your object.  The result is a new object with fields reshuffled and transformed.
 
 ## Credits
 
