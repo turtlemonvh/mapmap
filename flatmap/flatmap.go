@@ -45,8 +45,37 @@ func NewFlatMap(m map[string]interface{}) *FlatMap {
 	return f
 }
 
+func (m *FlatMap) GetSubMap(prefix string) *FlatMap {
+	var newMap = make(map[string]interface{})
+	for k, v := range m.Map {
+		if strings.HasPrefix(k, "."+prefix) {
+			newMap[k] = v
+		}
+	}
+	return NewFlatMap(newMap)
+}
+
+func (m *FlatMap) Reshuffle(oldpath string, newpath string) error {
+	var tomove = make(map[string]interface{})
+	for k, v := range m.Map {
+		if strings.HasPrefix(k, "."+oldpath) {
+			tomove[k] = v
+		}
+	}
+
+	for k, v := range tomove {
+		delete(m.Map, k)
+
+		// k=.a.b.c ; oldpath=a.b; newpath=c
+		newKey := newpath + k[len(oldpath)+1:]
+		m.Map["."+newKey] = v
+	}
+
+	return nil
+}
+
 // Contains returns true if the map contains the given key.
-func (m FlatMap) Contains(key string) bool {
+func (m *FlatMap) Contains(key string) bool {
 	for _, k := range m.Keys() {
 		if k == key {
 			return true
@@ -56,7 +85,7 @@ func (m FlatMap) Contains(key string) bool {
 }
 
 // Delete deletes a key out of the map with the given prefix.
-func (m FlatMap) Delete(prefix string) {
+func (m *FlatMap) Delete(prefix string) {
 	prefix = m.Config.keyDelim + prefix
 	for k, _ := range m.Map {
 		match := k == prefix
@@ -75,7 +104,7 @@ func (m FlatMap) Delete(prefix string) {
 }
 
 // Keys returns list of top-level keys.
-func (m FlatMap) Keys() []string {
+func (m *FlatMap) Keys() []string {
 	var mapKeys = make(map[string]bool)
 	for k, _ := range m.Map {
 		mapKeys[strings.Split(k[1:], m.Config.keyDelim)[0]] = true
@@ -91,7 +120,7 @@ func (m FlatMap) Keys() []string {
 // Merge merges the contents of the other Map into this one.
 //
 // Any shared top level keys will be overwritten.
-func (m FlatMap) Merge(m2 *FlatMap) {
+func (m *FlatMap) Merge(m2 *FlatMap) {
 	for _, prefix := range m2.Keys() {
 		prefix = m.Config.keyDelim + prefix
 		m.Delete(prefix[1:])

@@ -10,11 +10,11 @@ import (
 )
 
 /*
- Flatten a map or slice into a map.
+Flatten a map or slice into a map.
 
 	* Keys in the resulting map are "." separated.
 	* Array indexes are enclosed in "[]"
-	* Terminal values can be: bool, int64, string
+	* Terminal values can be: bool, int (all varieties except Uint64), string
 */
 func Flatten(src interface{}) (map[string]interface{}, error) { return mc.Flatten(src) }
 func (c *FlatMapConfig) Flatten(src interface{}) (map[string]interface{}, error) {
@@ -64,16 +64,17 @@ func (c *FlatMapConfig) flatten(result map[string]interface{}, prefix string, v 
 	}
 
 	// Set as type interface
+	// https://golang.org/pkg/reflect/#Kind
 	switch v.Kind() {
 	case reflect.Bool:
 		result[c.keyDelim+prefix] = v.Bool()
-	case reflect.Int:
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32:
 		result[c.keyDelim+prefix] = v.Int()
 	case reflect.String:
 		result[c.keyDelim+prefix] = v.String()
 	case reflect.Map:
 		err = c.flattenMap(result, prefix, v)
-	case reflect.Slice:
+	case reflect.Slice, reflect.Array:
 		err = c.flattenSlice(result, prefix, v)
 	default:
 		err = fmt.Errorf("Unknown primitive type found for value: '%q'", v)

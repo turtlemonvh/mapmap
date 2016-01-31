@@ -24,5 +24,7 @@ Create a slice of `Mapper`s, and then call `mapmap.Mapit` on your object.  The r
 
 ## TODO
 
-* actual mapmap implementation
+* add transform functions
+* add validators
+* add type handling
 
