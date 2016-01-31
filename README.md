@@ -1,4 +1,5 @@
-# Mapmap
+Mapmap [![GoDoc](https://godoc.org/github.com/turtlemonvh/mapmap?status.svg)](https://godoc.org/github.com/turtlemonvh/mapmap)
+===
 
 > It maps your maps!
 
@@ -24,7 +25,4 @@ Create a slice of `Mapper`s, and then call `mapmap.Mapit` on your object.  The r
 ## TODO
 
 * actual mapmap implementation
-* escape key delimiter when flattening, unescape when expanding
-* tests for changing key delimiter
-    * e.g. merging maps with different delimiters
-* tougher tests in general
+
