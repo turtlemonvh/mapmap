@@ -8,7 +8,8 @@ import (
 
 func TestMapMap(t *testing.T) {
 	var v interface{}
-	var errs []error
+	var processingErrors []error
+	var err error
 
 	m := map[string]interface{}{
 		"cat":        "garfield",
@@ -28,8 +29,10 @@ func TestMapMap(t *testing.T) {
 	mappers = append(mappers, NewMapper("cat", "cat"))
 	mappers = append(mappers, NewMapper("turtle", "frog"))
 
-	v, errs = MapIt(m, mappers)
+	v, processingErrors, err = MapIt(m, mappers)
 
 	assert.Equal(t, cast.ToStringMap(v), r)
-	assert.Equal(t, errs, []error{})
+	assert.Equal(t, processingErrors, []error{})
+	assert.Equal(t, len(processingErrors), 0)
+	assert.Equal(t, err, nil)
 }

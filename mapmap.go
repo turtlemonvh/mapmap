@@ -34,10 +34,12 @@ func NewMapper(input string, output string) *Mapper {
 	return m
 }
 
-func MapIt(inMap interface{}, mappers []*Mapper) (interface{}, []error) {
+func MapIt(inMap interface{}, mappers []*Mapper) (interface{}, []error, error) {
+	var processingErrors = []error{}
+
 	inMapFlat, err := flatmap.Flatten(inMap)
 	if err != nil {
-		return nil, []error{err}
+		return nil, processingErrors, err
 	}
 
 	in := flatmap.NewFlatMap(inMapFlat)
@@ -51,5 +53,5 @@ func MapIt(inMap interface{}, mappers []*Mapper) (interface{}, []error) {
 	}
 	exp, err := flatmap.Expand(out.Map, "")
 
-	return exp, []error{}
+	return exp, processingErrors, err
 }

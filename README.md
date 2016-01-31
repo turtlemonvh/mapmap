@@ -27,4 +27,4 @@ Create a slice of `Mapper`s, and then call `mapmap.Mapit` on your object.  The r
 * add transform functions
 * add validators
 * add type handling
-
+* add error handling (returning array of errors) in addition to standard handling
