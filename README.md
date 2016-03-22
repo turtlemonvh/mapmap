@@ -3,6 +3,8 @@ Mapmap [![GoDoc](https://godoc.org/github.com/turtlemonvh/mapmap?status.svg)](ht
 
 > It maps your maps!
 
+> **WARNING:** Development of this library has been suspended (3/22/2016) because other libraries seem to provide similar features in a better way. The `flatmap` package may still be useful for some projects.
+
 > **WORK IN PROGRESS:** Very limited features so far.
 
 ## Quick Start
@@ -66,9 +68,31 @@ map[string]interface{}{
 * Lots of source taken from the [`flatmap` library](https://github.com/hashicorp/terraform/blob/master/flatmap/flatten.go) in terraform.
     * Mostly I just manage maps with interfaces and return errors instead of panicing.
 
+## Alternatives
+
+The following is a list of libraries that you may want to use instead of `mapmap`.
+
+* https://github.com/buger/jsonparser
+    * fast json parser
+    * allows accessing values by path
+* https://github.com/fatih/structs
+    * package for working with arbitrary `struct`s and transforming into `map[string]interface{}`
+* https://github.com/mitchellh/mapstructure
+    * package for converting between `struct`s and arbitrary `map`s
+    * good for json of unknown strucrure
+* https://github.com/Jeffail/gabs
+    * package for working with dynamic or unknown json
+    * allows accessing values by path
+* https://github.com/akutz/golf
+    * package for listing the fields of arbitrary data types
+
+
+
 ## TODO
 
 * add transform functions
 * add validators
 * add type handling
 * add error handling (returning array of errors) in addition to standard handling
+* add benchmarks for simple transformations
+
