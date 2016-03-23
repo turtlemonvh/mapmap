@@ -85,7 +85,10 @@ The following is a list of libraries that you may want to use instead of `mapmap
     * allows accessing values by path
 * https://github.com/akutz/golf
     * package for listing the fields of arbitrary data types
-
+* https://github.com/imdario/mergo
+    * package for merging go structs and maps
+* https://github.com/mitchellh/reflectwalk
+    * package for walking complex object structures
 
 
 ## TODO
